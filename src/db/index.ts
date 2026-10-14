@@ -1,8 +1,16 @@
 import { Database } from "bun:sqlite";
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import * as schema from "./schema";
+import { existsSync, mkdirSync } from "fs";
+import { dirname } from "path";
 
-const sqlite = new Database("orders.sqlite");
+const dbPath = process.env.DATABASE_PATH || "orders.sqlite";
+const dbDir = dirname(dbPath);
+if (dbDir && dbDir !== "." && !existsSync(dbDir)) {
+  mkdirSync(dbDir, { recursive: true });
+}
+
+const sqlite = new Database(dbPath);
 
 // Auto-create table if not exists
 sqlite.run(`
